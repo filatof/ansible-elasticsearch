@@ -8,3 +8,5 @@ TODO
 .idea/
 elasticsearch.iml
 !/vars/RedHat.yml
+files/certs/
+files/elasticsearch-7.17.28-arm64.deb
