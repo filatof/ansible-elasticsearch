@@ -2,7 +2,7 @@
 
 # It is possible to set these are defaults with messy jinja templating one liners however:
 # 1. That is really hard to read and debug
-# 2. When running multiple plays with the same role the defaults are not re-evaluated. An example of this
+# 2. When running multiple plays with the same roles the defaults are not re-evaluated. An example of this
 # can be seen in our the https://github.com/elastic/ansible-elasticsearch/blob/main/test/integration/xpack.yml
 # integration test and in the Multi Node server documentation examples https://github.com/elastic/ansible-elasticsearch/blob/main/test/integration/xpack.yml
 - name: Set backward compatibility for deprecated es_enable_xpack variable
@@ -14,7 +14,7 @@
     debug:
       msg: "WARNING: es_enable_xpack variable is now deprecated. You should use oss_version instead"
 
-- name: Set the defaults here otherwise they can't be overriden in the same play if the role is called twice
+- name: Set the defaults here otherwise they can't be overriden in the same play if the roles is called twice
   set_fact:
     es_repo_name: "{{ es_major_version }}"
     es_package_name: "elasticsearch"

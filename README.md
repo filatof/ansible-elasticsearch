@@ -1,15 +1,6 @@
 # ARCHIVED
 
-This project is no longer maintained.
-
-You are welcomed to keep using it and adapting it to work for your own needs, including with Elasticsearch [8.x](docs/8x-support.md).
-
-For alternative getting started experiences, you may want to try one of these options:
-
-- Start a [free trial on Elastic Cloud](https://www.elastic.co/cloud/elasticsearch-service/signup), our hosted service.
-- Take a look at [Elastic Cloud on Kubernetes (ECK)](https://elastic.co/guide/en/cloud-on-k8s/current/k8s-quickstart.html) for launching the stack via Kubernetes.
-- Read our [Running the Elastic Stack on Docker](https://www.elastic.co/guide/en/elastic-stack-get-started/current/get-started-docker.html) guide.
-- Take a look at the [Elastic Stack Terraform provider.](https://github.com/elastic/terraform-provider-elasticstack)
+Это fork https://github.com/elastic/ansible-elasticsearch.git Переделал установку из зеркала Яндекс
 
 # ansible-elasticsearch
 [![Ansible Galaxy](https://img.shields.io/badge/ansible--galaxy-elastic.elasticsearch-blue.svg)](https://galaxy.ansible.com/elastic/elasticsearch/)
@@ -17,54 +8,47 @@ For alternative getting started experiences, you may want to try one of these op
 
 **THIS ROLE IS FOR 7.x & 6.x**, but should still work with 8.x (see [note](docs/8x-support.md)).
 
-Ansible role for 7.x/6.x Elasticsearch - tests used to run and pass on the below platforms:
+Роль Ansible для Elasticsearch 7.x/8.x — тесты, которые запускаются и проходят на следующих платформах:
 
-* Ubuntu 16.04
 * Ubuntu 18.04
-* Ubuntu 20.04
-* Debian 8
-* Debian 9
-* Debian 10
-* CentOS 7
-* Amazon Linux 2
+* Ubuntu 22.04
+
 
 ## BREAKING CHANGES
 
 ### Notice about multi-instance support
 
-* If you use only one instance but want to upgrade from an older ansible-elasticsearch version, follow [upgrade procedure](https://github.com/elastic/ansible-elasticsearch/blob/main/docs/multi-instance.md#upgrade-procedure)
-* If you install more than one instance of Elasticsearch on the same host (with different ports, directory and config files), **do not update to ansible-elasticsearch >= 7.1.1**, please follow this [workaround](https://github.com/elastic/ansible-elasticsearch/blob/main/docs/multi-instance.md#workaround) instead.
-* For multi-instances use cases, we are now recommending Docker containers using our official images (https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html).
+* Если вы используете только один экземпляр, но хотите выполнить обновление с более старой версии ansible-elasticsearch, следуйте [upgrade procedure](https://github.com/elastic/ansible-elasticsearch/blob/main/docs/multi-instance.md#upgrade-procedure)
+* Если вы устанавливаете несколько экземпляров Elasticsearch на одном хосте (с разными портами, каталогами и файлами конфигурации), не обновляйте ansible-elasticsearch до версии >= 7.1.1. Вместо этого воспользуйтесь [workaround](https://github.com/elastic/ansible-elasticsearch/blob/main/docs/multi-instance.md#workaround) .
+* Для сценариев использования с несколькими экземплярами мы теперь рекомендуем использовать контейнеры Docker с нашими официальными образами (https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html).
 
 ### Removing the MAX_THREAD settings
 
-Ansible-elasticsearch 7.5.2 is removing the option to customize the maximum number of threads the process can start in [#637](https://github.com/elastic/ansible-elasticsearch/pull/637/files#diff-04c6e90faac2675aa89e2176d2eec7d8L408).
-We discovered that this option wasn't working anymore since multi-instance support removal in ansible-elasticsearch 7.1.1.
-This option will be added back in a following release if it's still relevant regarding latest Elasticsearch evolutions.
+В Ansible-elasticsearch 7.5.2 удалена возможность настройки максимального количества потоков, которые может запустить процесс [#637](https://github.com/elastic/ansible-elasticsearch/pull/637/files#diff-04c6e90faac2675aa89e2176d2eec7d8L408).
+Мы обнаружили, что эта опция больше не работает после удаления поддержки нескольких экземпляров в Ansible-elasticsearch 7.1.1. Эта опция будет добавлена в следующем выпуске, если она по-прежнему актуальна с учётом последних изменений в Elasticsearch.
 
 ### Changes about configuration files
 
-Ansible-elasticsearch 7.5.2 is updating the configuration files provided by this role in [#637](https://github.com/elastic/ansible-elasticsearch/pull/637) which contained some options deprecated in 6.x and 7.x:
-- `/etc/default/elasticsearch`|`/etc/sysconfig/elasticsearch`: the new template reflect the configuration file provided by Elasticsearch >= 6.x, the parameters we removed were already not used in 6.x and 7.x
-- `/etc/elasticsearch/jvm.options`: the new template reflect the configuration files provided by Elasticsearch >= 6.x
+Ansible-elasticsearch 7.5.2 обновляет файлы конфигурации, предоставляемые этой ролью в [#637](https://github.com/elastic/ansible-elasticsearch/pull/637) которые содержали некоторые параметры, устаревшие в версиях 6.x и 7.x:
+- `/etc/default/elasticsearch`|`/etc/sysconfig/elasticsearch`: новый шаблон отражает файл конфигурации, предоставляемый Elasticsearch >= 6.x, параметры, которые мы удалили, уже не использовались в версиях 6.x и 7.x
+- `/etc/elasticsearch/jvm.options`: новый шаблон отражает файлы конфигурации, предоставляемые Elasticsearch >= 6.x
 - `/etc/elasticsearch/log4j2.properties`:
-  - We removed `log4j2.properties.j2` template from this Ansible role as it was a static file not bringing any customization specific to some ansible variable.
-  - Deployment of this Ansible role on new servers will get the default `log4j2.properties` provided by Elasticsearch without any override.
-  - **WARNING**: For upgrade scenarios where this file was already managed by previous versions of ansible-elasticsearch, this file will become unmanaged and won't be updated by default. If you wish to update it to 7.5 version, you can retrieve it [here](https://github.com/elastic/elasticsearch/blob/7.5/distribution/src/config/log4j2.properties) and use this file with `es_config_log4j2` Ansible variable (see below).
+  - Мы удалили шаблон `log4j2.properties.j2` из этой роли Ansible, так как это был статичный файл, не содержащий никаких настроек, связанных с какой-либо переменной Ansible.
+  - При развёртывании этой роли Ansible на новых серверах будет использоваться `log4j2.properties` по умолчанию, предоставляемый Elasticsearch, без каких-либо изменений.
+  - **ВНИМАНИЕ**: в сценариях обновления, где этот файл уже управлялся предыдущими версиями ansible-elasticsearch, этот файл перестанет управляться и не будет обновляться по умолчанию. Если вы хотите обновить его до версии 7.5, вы можете получить его [here](https://github.com/elastic/elasticsearch/blob/7.5/distribution/src/config/log4j2.properties) и использовать этот файл с `es_config_log4j2` переменной Ansible.
 
 ### Removing OSS distribution for versions >= 7.11.0
 
-Starting from Elasticsearch 7.11.0, OSS distributions will no longer be provided following the recent Elasticsearch license change.
+Начиная с Elasticsearch 7.11.0, дистрибутивы OSS больше не будут предоставляться в соответствии с недавними изменениями в лицензии Elasticsearch.
 
-This Ansible role will fail if `oss_version` is set to `true` and `es_version` is greater than 
-`7.11.0`.
+Эта роль Ansible не сработает, если `oss_version` равно true и `es_version` больше 7.11.0.
 
-See [Doubling down on open, Part II](https://www.elastic.co/blog/licensing-change)
-blog post for more details.
+Подробнее см. в статье [Doubling down on open, Part II](https://www.elastic.co/blog/licensing-change)
+
 
 #### How to override configuration files provided by ansible-elasticsearch?
 
-You can now override the configuration files with your own versions by using the following Ansible variables:
+Теперь вы можете заменить файлы конфигурации своими версиями, используя следующие переменные Ansible:
 - `es_config_default: "elasticsearch.j2"`: replace `elasticsearch.j2` by your own template to use a custom `/etc/default/elasticsearch`|`/etc/sysconfig/elasticsearch` configuration file
 - `es_config_jvm: "jvm.options.j2"`: replace `jvm.options.j2` by your own template to use a custom `/etc/elasticsearch/jvm.options` configuration file
 - `es_config_log4j2: ""`: set this variable to the path of your own template to use a custom `/etc/elasticsearch/log4j2.properties` configuration file
@@ -174,7 +158,6 @@ The use of a map ensures the Ansible playbook does not need to be updated to ref
 In addition to the es_config map, several other parameters are supported for additional functions e.g. script installation.  These can be found in the role's defaults/main.yml file.
 
 The following illustrates applying configuration parameters to an Elasticsearch instance.
-
 ```yaml
 - name: Elasticsearch with custom configuration
   hosts: localhost

@@ -135,7 +135,7 @@
 #List current roles not. inc those reserved
 - name: List Native Roles
   uri:
-    url: "{{ es_api_uri }}/{{ es_security_api }}/role"
+    url: "{{ es_api_uri }}/{{ es_security_api }}/roles"
     method: GET
     user: "{{es_api_basic_auth_username}}"
     password: "{{es_api_basic_auth_password}}"
@@ -170,7 +170,7 @@
 #Delete all non required roles NOT inc. reserved
 - name: Delete Native Roles
   uri:
-    url: "{{ es_api_uri }}/{{ es_security_api }}/role/{{ item | urlencode }}"
+    url: "{{ es_api_uri }}/{{ es_security_api }}/roles/{{ item | urlencode }}"
     method: DELETE
     status_code: 200
     user: "{{es_api_basic_auth_username}}"
@@ -187,7 +187,7 @@
 #Update other roles - NOT inc. reserved roles
 - name: Update Native Roles
   uri:
-    url: "{{ es_api_uri }}/{{ es_security_api }}/role/{{ item | urlencode }}"
+    url: "{{ es_api_uri }}/{{ es_security_api }}/roles/{{ item | urlencode }}"
     method: POST
     body_format: json
     body: "{{ es_roles.native[item] | to_json}}"
